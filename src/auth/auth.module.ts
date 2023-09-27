@@ -15,9 +15,9 @@ import { UserModule } from "../user/user.module";
       session: false,
     }),
     JwtModule.register({
-      secret: "qcm-factory-secret",
+      secret: "inpt-secret-key",
       signOptions: {
-        expiresIn: "50m",
+        expiresIn: "60m",
       },
     }),
   ],

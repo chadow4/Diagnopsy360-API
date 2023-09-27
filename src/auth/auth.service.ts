@@ -1,5 +1,4 @@
 import { JwtService } from "@nestjs/jwt";
-import { RegistrationStatus } from "./interface/registration-status.interface";
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { LoginStatus } from "./interface/login-status.interface";
 import { JwtPayload } from "./interface/payload.interface";
@@ -18,12 +17,12 @@ export class AuthService {
     try {
       await this.usersService.createUser(userDto);
     } catch (err) {
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   async login(loginUserDto: UserLoginDto): Promise<LoginStatus> {
-    if(!loginUserDto.email || !loginUserDto.password){
+    if (!loginUserDto.email || !loginUserDto.password) {
       throw new HttpException("email and password are required", HttpStatus.BAD_REQUEST);
     }
     // find user in db
@@ -45,7 +44,7 @@ export class AuthService {
   }
 
   private _createToken(user: UserDto): any {
-    const expiresIn = "50m";
+    const expiresIn = "60m";
 
     const payload = { id: user.id, email: user.email, role: user.role };
 
