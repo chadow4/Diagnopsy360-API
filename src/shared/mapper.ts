@@ -1,5 +1,7 @@
 import { UserDto } from "../user/user.dto";
+import { TreatmentDto } from "../treatment/treatment.dto";
 import { UserEntity } from "../user/user.entity";
+import { TreatmentEntity } from "../treatment/treatment.entity";
 
 
 export const toUserDto = (data: UserEntity): UserDto => {
@@ -12,3 +14,12 @@ export const toUserDto = (data: UserEntity): UserDto => {
     role
   };
 };
+
+export const toTreatmentDto = (data: TreatmentEntity): TreatmentDto => {
+  const { id, name} = data;
+  return <TreatmentDto><unknown>{
+    id,
+    name
+  };
+};
+
