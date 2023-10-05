@@ -1,6 +1,7 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import * as bcrypt from "bcrypt";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
 import { Role } from "../auth/interface/role.enum";
+import { DiagnosisEntity } from "../diagnosis/diagnosis.entity";
+import * as bcrypt from "bcrypt";
 
 @Entity()
 export class UserEntity {
@@ -42,4 +43,14 @@ export class UserEntity {
     nullable: true
   })
   role: Role;
+
+  @OneToMany(() => DiagnosisEntity, (myDiagnoses) => myDiagnoses.patient)
+  myDiagnoses: DiagnosisEntity[];
+
+  @OneToMany(() => DiagnosisEntity, (myPatientsDiagnoses) => myPatientsDiagnoses.doctor)
+  myPatientsDiagnoses: DiagnosisEntity[];
+
+
+
+
 }

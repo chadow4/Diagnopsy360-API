@@ -9,6 +9,8 @@ import { AuthModule } from "./auth/auth.module";
 import { TreatmentModule } from './treatment/treatment.module';
 import * as process from "process";
 import { TreatmentEntity } from './treatment/treatment.entity';
+import { DiagnosisModule } from './diagnosis/diagnosis.module';
+import { DiagnosisEntity } from "./diagnosis/diagnosis.entity";
 
 @Module({
   imports: [
@@ -20,12 +22,13 @@ import { TreatmentEntity } from './treatment/treatment.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [UserEntity, TreatmentEntity],
+      entities: [UserEntity, TreatmentEntity,DiagnosisEntity],
       synchronize: true
     }),
     UserModule,
     AuthModule,
-    TreatmentModule
+    TreatmentModule,
+    DiagnosisModule
   ],
   controllers: [AppController],
   providers: [AppService],
