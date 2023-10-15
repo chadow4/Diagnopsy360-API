@@ -8,7 +8,7 @@ import { DiagnosisDto } from "../diagnosis/diagnosis.dto";
 
 export const toUserDto = (data: UserEntity): UserDto => {
   const { id, firstname, lastname, email, role,myDiagnoses,myPatientsDiagnoses} = data;
-  return <PatientDto><unknown>{
+  return <UserDto><unknown>{
     id,
     firstname,
     lastname,
