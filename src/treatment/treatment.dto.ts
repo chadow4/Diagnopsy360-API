@@ -24,4 +24,5 @@ export class TreatmentDto {
   @ApiProperty({ description: "Name of the Treatment" })
   @IsNotEmpty()
   name: string;
+
 }

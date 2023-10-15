@@ -1,6 +1,8 @@
-import {IsEmail, IsNotEmpty} from 'class-validator';
-import {ApiProperty} from '@nestjs/swagger';
-import {Role} from '../auth/interface/role.enum';
+import { IsEmail, IsNotEmpty } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { Role } from "../auth/interface/role.enum";
+import { DiagnosisDto } from "../diagnosis/diagnosis.dto";
+
 export class UserCreateDto {
     @IsNotEmpty()
     firstname: string;
@@ -42,24 +44,33 @@ export class UserLoginDto {
 }
 
 export class UserDto {
-    @ApiProperty({description: 'ID of the user'})
+    @ApiProperty({ description: "ID of the user" })
     @IsNotEmpty()
     id: number;
 
-    @ApiProperty({description: 'First name of the user'})
+    @ApiProperty({ description: "First name of the user" })
     @IsNotEmpty()
     firstname: string;
 
-    @ApiProperty({description: 'Last name of the user'})
+    @ApiProperty({ description: "Last name of the user" })
     @IsNotEmpty()
     lastname: string;
 
-    @ApiProperty({description: 'Email of the user'})
+    @ApiProperty({ description: "Email of the user" })
     @IsNotEmpty()
     @IsEmail()
     email: string;
 
-    @ApiProperty({description: 'Role of the user'})
+    @ApiProperty({ description: "Role of the user" })
     @IsNotEmpty()
     role: Role;
+
+}
+
+export class DoctorDto extends UserDto {
+    myPatientsDiagnoses: DiagnosisDto[];
+}
+
+export class PatientDto extends UserDto {
+    myDiagnoses: DiagnosisDto[];
 }

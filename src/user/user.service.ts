@@ -1,11 +1,11 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
-import {InjectRepository} from "@nestjs/typeorm";
-import {UserEntity} from "./user.entity";
-import {Repository} from "typeorm";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UserEntity } from "./user.entity";
+import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
-import {UserCreateDto, UserDto, UserLoginDto, UserUpdateDto} from "./user.dto";
-import {toUserDto} from "../shared/mapper";
-import {Role} from "../auth/interface/role.enum";
+import { UserCreateDto, UserDto, UserLoginDto, UserUpdateDto } from "./user.dto";
+import { toDoctorDto, toPatientDto, toUserDto } from "../shared/mapper";
+import { Role } from "../auth/interface/role.enum";
 
 @Injectable()
 export class UserService {
@@ -23,18 +23,18 @@ export class UserService {
 
     async findOneById(id: number): Promise<UserDto> {
         const user = await this.usersRepository.findOne({
-            where: {id},
-            relations: ['myDiagnoses','myDiagnoses.doctor','myPatientsDiagnoses','myPatientsDiagnoses.patient']
+            where: { id },
+            relations: ["myDiagnoses", "myDiagnoses.doctor", "myDiagnoses.treatments", "myPatientsDiagnoses", "myPatientsDiagnoses.patient", "myPatientsDiagnoses.treatments"]
         });
         if (!user) {
             throw new HttpException("User not Found", HttpStatus.NOT_FOUND);
         }
-        return toUserDto(user);
+        return user.role === "patient" ? toPatientDto(user) : toDoctorDto(user);
     }
 
     async findOneByEmail(email: string): Promise<UserDto> {
         const user = await this.usersRepository.findOne({
-            where: {email},
+            where: { email },
             relations: []
         });
         if (!user) {
@@ -43,8 +43,8 @@ export class UserService {
         return toUserDto(user);
     }
 
-    async findByLogin({email, password}: UserLoginDto): Promise<UserDto> {
-        const user = await this.usersRepository.findOne({where: {email}});
+    async findByLogin({ email, password }: UserLoginDto): Promise<UserDto> {
+        const user = await this.usersRepository.findOne({ where: { email } });
         if (!user) {
             throw new HttpException("User not Found", HttpStatus.BAD_REQUEST);
         }
@@ -59,12 +59,12 @@ export class UserService {
         if (!userCreateDto.firstname || !userCreateDto.lastname || !userCreateDto.email || !userCreateDto.password) {
             throw new HttpException("Missing Fields", HttpStatus.BAD_REQUEST);
         }
-        const existingUser = await this.usersRepository.findOne({where: {email: userCreateDto.email}});
+        const existingUser = await this.usersRepository.findOne({ where: { email: userCreateDto.email } });
         if (existingUser) {
             throw new HttpException("User Already Exist", HttpStatus.CONFLICT);
         }
         const user = this.usersRepository.create(userCreateDto);
-        user.role = <Role>"user";
+        user.role = <Role>"patient";
         try {
             await this.usersRepository.save(user);
         } catch (error) {
@@ -73,7 +73,7 @@ export class UserService {
     }
 
     async updateUser(sessionId: number, userUpdateDto: UserUpdateDto) {
-        const user = await this.usersRepository.findOne({where: {id: sessionId}});
+        const user = await this.usersRepository.findOne({ where: { id: sessionId } });
         if (!user) {
             throw new HttpException("User not Found", HttpStatus.NOT_FOUND);
         }
@@ -89,7 +89,7 @@ export class UserService {
     }
 
     async deleteUser(idUser: number) {
-        const user = await this.usersRepository.findOne({where: {id: idUser}});
+        const user = await this.usersRepository.findOne({ where: { id: idUser } });
         if (!user) {
             throw new HttpException("User not Found", HttpStatus.NOT_FOUND);
         }

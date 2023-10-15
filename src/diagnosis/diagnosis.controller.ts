@@ -15,7 +15,7 @@ export class DiagnosisController {
   }
 
   @Get()
-  @HasRoles(Role.Admin)
+  @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async getDiagnosisNotValidated() {
     try {
@@ -39,7 +39,7 @@ export class DiagnosisController {
   }
 
   @Put("select/:id")
-  @HasRoles(Role.Admin)
+  @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async selectDoctorDiagnosis(@Request() req, @Param("id") diagnosisId: number) {
     try {
@@ -53,7 +53,7 @@ export class DiagnosisController {
   }
 
   @Put("response/:id")
-  @HasRoles(Role.Admin)
+  @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async createResponseDiagnosis(@Request() req, @Param("id") diagnosisId, @Body() responseDiagnosisDto: ResponseDiagnosisDto) {
     try {

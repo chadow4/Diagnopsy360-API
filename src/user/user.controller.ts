@@ -35,7 +35,7 @@ export class UserController {
   }
 
   @Get(":id")
-  @HasRoles(Role.Admin)
+  @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async findOneById(@Param("id") id: number) {
     try {

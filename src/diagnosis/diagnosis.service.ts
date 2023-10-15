@@ -1,18 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { UserEntity } from "../user/user.entity";
 import { DiagnosisEntity } from "./diagnosis.entity";
 import { ResponseDiagnosisDto, SendSymtomsDiagnosisDto } from "./diagnosis.dto";
 import { toDiagnosisDto } from "../shared/mapper";
+import { TreatmentEntity } from "../treatment/treatment.entity";
 
 @Injectable()
 export class DiagnosisService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly usersRepository: Repository<UserEntity>,
-    @InjectRepository(DiagnosisEntity)
-    private readonly diagnosisRepository: Repository<DiagnosisEntity>
+      @InjectRepository(UserEntity)
+      private readonly usersRepository: Repository<UserEntity>,
+      @InjectRepository(DiagnosisEntity)
+      private readonly diagnosisRepository: Repository<DiagnosisEntity>,
+      @InjectRepository(TreatmentEntity)
+      private readonly treatmentRepository: Repository<TreatmentEntity>
   ) {
   }
 
@@ -53,7 +56,7 @@ export class DiagnosisService {
 
     const diagnosis = await this.diagnosisRepository.findOne({
       where: { id: diagnosisId },
-      relations: ['doctor']
+      relations: ["doctor"]
     });
 
     if (!diagnosis) {
@@ -72,27 +75,33 @@ export class DiagnosisService {
     }
   }
 
-  async createResponseDiagnosis(responseDiagnosisDto: ResponseDiagnosisDto,doctorId,diagnosisId) {
+  async createResponseDiagnosis(responseDiagnosisDto: ResponseDiagnosisDto, doctorId, diagnosisId) {
 
-    if(!responseDiagnosisDto.diagnosisResponse){
-      throw new HttpException("Response is required", HttpStatus.BAD_REQUEST);
+    if (!responseDiagnosisDto.diagnosisResponse || !responseDiagnosisDto.treatmentIds) {
+      throw new HttpException("Diagnosis responses and treatment required", HttpStatus.BAD_REQUEST);
     }
     const diagnosis = await this.diagnosisRepository.findOne({
       where: { id: diagnosisId },
-      relations: ['doctor']
+      relations: ["doctor"]
     });
 
     if (!diagnosis) {
       throw new HttpException("Diagnosis not found", HttpStatus.NOT_FOUND);
     }
 
-    if(diagnosis.doctor.id != doctorId){
+    if (diagnosis.doctor.id != doctorId) {
       throw new HttpException("You are not the doctor of this diagnosis", HttpStatus.BAD_REQUEST);
     }
 
     diagnosis.diagnosisResponse = responseDiagnosisDto.diagnosisResponse;
     diagnosis.diagnosisValidated = true;
     diagnosis.diagnosisDate = new Date();
+    diagnosis.treatments = await this.treatmentRepository.find({
+      where: {
+        id: In(responseDiagnosisDto.treatmentIds)
+      }
+    });
+
     try {
       await this.diagnosisRepository.save(diagnosis);
     } catch (err) {

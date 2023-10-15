@@ -13,7 +13,7 @@ export class TreatmentController {
   }
 
   @Get(":id")
-  @HasRoles(Role.Admin)
+  @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async findOneById(@Param("id") id: number) {
     try {
@@ -25,7 +25,7 @@ export class TreatmentController {
 
   @Get()
   @UseGuards(AuthGuard("jwt"))
-  @HasRoles(Role.Admin)
+  @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async showAllTreatments() {
     try {

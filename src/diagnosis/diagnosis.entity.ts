@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany } from "typeorm";
 import { UserEntity } from "../user/user.entity";
+import { TreatmentEntity } from "../treatment/treatment.entity";
 
 @Entity()
 export class DiagnosisEntity {
@@ -23,4 +24,7 @@ export class DiagnosisEntity {
 
   @ManyToOne(() => UserEntity, (doctor) => doctor.myPatientsDiagnoses)
   doctor: UserEntity;
+
+  @ManyToMany(() => TreatmentEntity, (treatment) => treatment.diagnoses)
+  treatments: TreatmentEntity[];
 }

@@ -1,4 +1,5 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { DiagnosisEntity } from "../diagnosis/diagnosis.entity";
 
 @Entity()
 export class TreatmentEntity {
@@ -10,4 +11,8 @@ export class TreatmentEntity {
     nullable: false
   })
   name: string;
+
+  @ManyToMany(() => DiagnosisEntity, (diagnosis) => diagnosis.treatments)
+  @JoinTable({ name: 'treatment_diagnosis' })
+  diagnoses: DiagnosisEntity[];
 }
