@@ -118,13 +118,10 @@ export class DiagnosisService {
   }
 
   async getDiagnosisById(diagnosisId, sessionId) {
-
-    console.log(diagnosisId, sessionId);
     const diagnosis = await this.diagnosisRepository.findOne({
       where: { id: diagnosisId },
       relations: ["patient", "doctor"]
     });
-    console.log(diagnosis.doctor.id, diagnosis.patient.id, sessionId);
     if (sessionId != diagnosis.patient.id && sessionId != diagnosis.doctor.id) {
       throw new HttpException("You don't have access to this diagnosis", HttpStatus.BAD_REQUEST);
     }
