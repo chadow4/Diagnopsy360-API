@@ -10,12 +10,12 @@ import { TreatmentEntity } from "../treatment/treatment.entity";
 @Injectable()
 export class DiagnosisService {
   constructor(
-      @InjectRepository(UserEntity)
-      private readonly usersRepository: Repository<UserEntity>,
-      @InjectRepository(DiagnosisEntity)
-      private readonly diagnosisRepository: Repository<DiagnosisEntity>,
-      @InjectRepository(TreatmentEntity)
-      private readonly treatmentRepository: Repository<TreatmentEntity>
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(DiagnosisEntity)
+    private readonly diagnosisRepository: Repository<DiagnosisEntity>,
+    @InjectRepository(TreatmentEntity)
+    private readonly treatmentRepository: Repository<TreatmentEntity>
   ) {
   }
 
@@ -115,6 +115,21 @@ export class DiagnosisService {
       relations: ["patient"]
     });
     return diagnosis.map(diagnosis => toDiagnosisDto(diagnosis));
+  }
+
+  async getDiagnosisById(diagnosisId, sessionId) {
+
+    console.log(diagnosisId, sessionId);
+    const diagnosis = await this.diagnosisRepository.findOne({
+      where: { id: diagnosisId },
+      relations: ["patient", "doctor"]
+    });
+    console.log(diagnosis.doctor.id, diagnosis.patient.id, sessionId);
+    if (sessionId != diagnosis.patient.id && sessionId != diagnosis.doctor.id) {
+      throw new HttpException("You don't have access to this diagnosis", HttpStatus.BAD_REQUEST);
+    }
+
+    return toDiagnosisDto(diagnosis);
   }
 }
 

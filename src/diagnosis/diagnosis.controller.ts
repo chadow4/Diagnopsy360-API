@@ -25,6 +25,16 @@ export class DiagnosisController {
     }
   }
 
+  @Get(":id")
+  @UseGuards(AuthGuard("jwt"))
+  async getDiagnosisById(@Request() req, @Param("id") diagnosisId: number) {
+    try {
+      return this.diagnosisService.getDiagnosisById(diagnosisId, req.user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Post("send")
   @UseGuards(AuthGuard("jwt"))
   async sendSymptomsDiagnosis(@Request() req, @Body() sendSymptomsDiagnosisDto: SendSymtomsDiagnosisDto) {
@@ -57,7 +67,7 @@ export class DiagnosisController {
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   async createResponseDiagnosis(@Request() req, @Param("id") diagnosisId, @Body() responseDiagnosisDto: ResponseDiagnosisDto) {
     try {
-      await this.diagnosisService.createResponseDiagnosis(responseDiagnosisDto,req.user.id,diagnosisId);
+      await this.diagnosisService.createResponseDiagnosis(responseDiagnosisDto, req.user.id, diagnosisId);
       return {
         message: "You have responded to this diagnosis"
       };
