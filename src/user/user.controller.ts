@@ -34,6 +34,26 @@ export class UserController {
     }
   }
 
+  @Get("patients")
+  @UseGuards(AuthGuard("jwt"))
+  async showAllPatient(@Request() req) {
+    try {
+      return await this.userService.showAllPatient();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get("patientsnodoctor")
+  @UseGuards(AuthGuard("jwt"))
+  async showPatientsWithNoDoctor(@Request() req) {
+    try {
+      return await this.userService.showPatientsWithNoDoctor();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get(":id")
   @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)

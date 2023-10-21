@@ -128,5 +128,10 @@ export class DiagnosisService {
 
     return toDiagnosisDto(diagnosis);
   }
+
+  async getAllDiagnosis() {
+    const diagnosis = await this.diagnosisRepository.find();
+    return diagnosis.map(diagnosis => toDiagnosisDto(diagnosis));
+  }
 }
 

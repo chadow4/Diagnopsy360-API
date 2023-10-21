@@ -1,18 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "./user.entity";
-import { Repository } from "typeorm";
+import { Repository, Not, In, IsNull } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { UserCreateDto, UserDto, UserLoginDto, UserUpdateDto } from "./user.dto";
 import { toDoctorDto, toPatientDto, toUserDto } from "../shared/mapper";
 import { Role } from "../auth/interface/role.enum";
+import { DiagnosisEntity } from "src/diagnosis/diagnosis.entity";
 
 @Injectable()
 export class UserService {
 
     constructor(
         @InjectRepository(UserEntity)
-        private readonly usersRepository: Repository<UserEntity>
+        private readonly usersRepository: Repository<UserEntity>,
+        @InjectRepository(DiagnosisEntity)
+        private readonly diagnosisRepository: Repository<DiagnosisEntity>
     ) {
     }
 
@@ -96,4 +99,28 @@ export class UserService {
         await this.usersRepository.remove(user);
     }
 
+    async showAllPatient():Promise<UserDto[]> {
+        const users = await this.usersRepository.find({ where: { role: Role.Patient } });
+        console.log(users);
+        return users.map(user => toUserDto(user));
+    }
+    
+    async showPatientsWithNoDoctor(): Promise<UserDto[]> {
+        // Trouvez tous les diagnostics où le champ 'doctor' est null
+        const patientsWithoutDoctor = await this.diagnosisRepository.find({
+            where: {
+                doctor: IsNull()
+            },
+            relations: ['patient']
+        });
+    
+        // Utilisez un Set pour garantir l'unicité des identifiants des patients
+        const uniquePatientIds = [...new Set(patientsWithoutDoctor.map(diagnosis => diagnosis.patient.id))];
+    
+        // Obtenez les utilisateurs correspondant à ces identifiants uniques
+        const usersWithoutDoctor = await this.usersRepository.findByIds(uniquePatientIds);
+        
+        return usersWithoutDoctor.map(user => toUserDto(user));
+    }
+    
 }
