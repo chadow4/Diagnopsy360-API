@@ -25,6 +25,16 @@ export class DiagnosisController {
     }
   }
 
+  @Get("mydiags/:id")
+  async selectMyDiagnosis(@Request() req, @Param("id") doctorId: number) {
+    try {
+      console.log(doctorId);
+      return await this.diagnosisService.selectMyDiagnosis(doctorId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get(":id")
   @UseGuards(AuthGuard("jwt"))
   async getDiagnosisById(@Request() req, @Param("id") diagnosisId: number) {
@@ -75,7 +85,6 @@ export class DiagnosisController {
       throw error;
     }
   }
-
 
 }
 

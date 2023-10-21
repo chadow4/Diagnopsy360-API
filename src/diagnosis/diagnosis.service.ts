@@ -133,5 +133,29 @@ export class DiagnosisService {
     const diagnosis = await this.diagnosisRepository.find();
     return diagnosis.map(diagnosis => toDiagnosisDto(diagnosis));
   }
+
+  async selectMyDiagnosis(doctorId: number) {
+    const doctor = await this.usersRepository.findOne({
+      where: { id: doctorId },
+      relations: []
+    });
+
+    if (!doctor) {
+      throw new HttpException("Doctor not found", HttpStatus.NOT_FOUND);
+    }
+
+    const doctorDiagnoses = await this.diagnosisRepository.find({
+      where: { doctor: { id: doctorId } },
+      relations: ["patient"] // Si vous voulez charger d'autres relations, ajoutez-les ici
+    });
+
+    if (!doctorDiagnoses || doctorDiagnoses.length === 0) {
+      throw new HttpException("No diagnosis found for this doctor", HttpStatus.NOT_FOUND);
+    }
+    console.log(doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses)));
+    return doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses));
+
+}
+
 }
 
