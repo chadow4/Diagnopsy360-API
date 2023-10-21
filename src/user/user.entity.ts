@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany, BeforeUpdate } from "typeorm";
 import { Role } from "../auth/interface/role.enum";
 import { DiagnosisEntity } from "../diagnosis/diagnosis.entity";
 import * as bcrypt from "bcrypt";
@@ -34,6 +34,7 @@ export class UserEntity {
   password: string;
 
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
   }

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Put, Request, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { UserUpdateDto } from "./user.dto";
+import { UserUpdateDto, UserUpdatePasswordDto } from "./user.dto";
 import { HasRoles } from "../auth/has-roles.decorator";
 import { Role } from "../auth/interface/role.enum";
 import { AuthGuard } from "@nestjs/passport";
@@ -52,6 +52,19 @@ export class UserController {
       await this.userService.updateUser(req.user.id, userUpdateDto);
       return {
         message: "User updated"
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Put("password")
+  @UseGuards(AuthGuard("jwt"))
+  async updateUserPassword(@Request() req, @Body() userUpdatePasswordDto: UserUpdatePasswordDto) {
+    try {
+      await this.userService.updateUserPassword(req.user.id, userUpdatePasswordDto);
+      return {
+        message: "Password updated"
       };
     } catch (error) {
       throw error;

@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "./user.entity";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { UserCreateDto, UserDto, UserLoginDto, UserUpdateDto } from "./user.dto";
+import { UserCreateDto, UserDto, UserLoginDto, UserUpdateDto, UserUpdatePasswordDto } from "./user.dto";
 import { toDoctorDto, toPatientDto, toUserDto } from "../shared/mapper";
 import { Role } from "../auth/interface/role.enum";
 
@@ -86,6 +86,26 @@ export class UserService {
         } catch (error) {
             throw new HttpException("Error Updating User", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    async updateUserPassword(sessionId: number, userUpdatePasswordDto: UserUpdatePasswordDto){
+
+        if(!userUpdatePasswordDto.lastPassword || !userUpdatePasswordDto.newPassword){
+            throw new HttpException("Missing Fields", HttpStatus.BAD_REQUEST);
+        }
+
+        const user = await this.usersRepository.findOne({ where: { id: sessionId } });
+        if (!user) {
+            throw new HttpException("User not Found", HttpStatus.NOT_FOUND);
+        }
+        const areEqual = await bcrypt.compare(userUpdatePasswordDto.lastPassword, user.password);
+        if (!areEqual) {
+            throw new HttpException("Wrong Password", HttpStatus.BAD_REQUEST);
+        }
+
+        user.password = userUpdatePasswordDto.newPassword;
+        await this.usersRepository.save(user);
+
     }
 
     async deleteUser(idUser: number) {

@@ -4,73 +4,80 @@ import { Role } from "../auth/interface/role.enum";
 import { DiagnosisDto } from "../diagnosis/diagnosis.dto";
 
 export class UserCreateDto {
-    @IsNotEmpty()
-    firstname: string;
+  @IsNotEmpty()
+  firstname: string;
 
-    @IsNotEmpty()
-    lastname: string;
+  @IsNotEmpty()
+  lastname: string;
 
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-    @IsNotEmpty()
-    password: string;
+  @IsNotEmpty()
+  password: string;
 }
 
 export class UserUpdateDto {
-    firstname?: string;
+  firstname?: string;
 
-    lastname?: string;
+  lastname?: string;
 
-    @IsEmail()
-    email?: string;
+  @IsEmail()
+  email?: string;
 
-    password?: string;
+  password?: string;
+}
+
+export class UserUpdatePasswordDto {
+  @IsNotEmpty()
+  lastPassword: string;
+  @IsNotEmpty()
+  newPassword: string;
 }
 
 export class UserDeleteDto {
-    @IsNotEmpty()
-    id: number;
+  @IsNotEmpty()
+  id: number;
 }
 
 export class UserLoginDto {
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-    @IsNotEmpty()
-    password: string;
+  @IsNotEmpty()
+  password: string;
 }
 
 export class UserDto {
-    @ApiProperty({ description: "ID of the user" })
-    @IsNotEmpty()
-    id: number;
+  @ApiProperty({ description: "ID of the user" })
+  @IsNotEmpty()
+  id: number;
 
-    @ApiProperty({ description: "First name of the user" })
-    @IsNotEmpty()
-    firstname: string;
+  @ApiProperty({ description: "First name of the user" })
+  @IsNotEmpty()
+  firstname: string;
 
-    @ApiProperty({ description: "Last name of the user" })
-    @IsNotEmpty()
-    lastname: string;
+  @ApiProperty({ description: "Last name of the user" })
+  @IsNotEmpty()
+  lastname: string;
 
-    @ApiProperty({ description: "Email of the user" })
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
+  @ApiProperty({ description: "Email of the user" })
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-    @ApiProperty({ description: "Role of the user" })
-    @IsNotEmpty()
-    role: Role;
+  @ApiProperty({ description: "Role of the user" })
+  @IsNotEmpty()
+  role: Role;
 
 }
 
 export class DoctorDto extends UserDto {
-    myPatientsDiagnoses: DiagnosisDto[];
+  myPatientsDiagnoses: DiagnosisDto[];
 }
 
 export class PatientDto extends UserDto {
-    myDiagnoses: DiagnosisDto[];
+  myDiagnoses: DiagnosisDto[];
 }
