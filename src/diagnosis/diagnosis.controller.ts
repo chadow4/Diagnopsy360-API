@@ -25,11 +25,12 @@ export class DiagnosisController {
     }
   }
 
-  @Get("mydiags/:id")
-  async selectMyDiagnosis(@Request() req, @Param("id") doctorId: number) {
+  @Get("mydiags")
+  @UseGuards(AuthGuard("jwt"))
+  async selectMyDiagnosis(@Request() req) {
     try {
-      console.log(doctorId);
-      return await this.diagnosisService.selectMyDiagnosis(doctorId);
+      console.log(req.user.id);
+      return await this.diagnosisService.selectMyDiagnosis(req.user.id);
     } catch (error) {
       throw error;
     }
