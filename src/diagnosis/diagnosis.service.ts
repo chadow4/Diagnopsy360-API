@@ -5,6 +5,7 @@ import { UserEntity } from "../user/user.entity";
 import { DiagnosisEntity } from "./diagnosis.entity";
 import { ResponseDiagnosisDto, SendSymtomsDiagnosisDto } from "./diagnosis.dto";
 import { toDiagnosisDto } from "../shared/mapper";
+import { Role } from "../auth/interface/role.enum";
 import { TreatmentEntity } from "../treatment/treatment.entity";
 
 @Injectable()
@@ -117,15 +118,15 @@ export class DiagnosisService {
     return diagnosis.map(diagnosis => toDiagnosisDto(diagnosis));
   }
 
-  async getDiagnosisById(diagnosisId, sessionId) {
+  async getDiagnosisById(diagnosisId, sessionId, role) {
     const diagnosis = await this.diagnosisRepository.findOne({
       where: { id: diagnosisId },
       relations: ["patient", "doctor"]
     });
-    if (sessionId != diagnosis.patient.id && sessionId != diagnosis.doctor.id) {
+    console.log(sessionId != diagnosis.patient.id && role != Role.Doctor);
+    if (sessionId != diagnosis.patient.id && role != Role.Doctor) {
       throw new HttpException("You don't have access to this diagnosis", HttpStatus.BAD_REQUEST);
     }
-
     return toDiagnosisDto(diagnosis);
   }
 
@@ -134,7 +135,7 @@ export class DiagnosisService {
     return diagnosis.map(diagnosis => toDiagnosisDto(diagnosis));
   }
 
-  async selectMyDiagnosis(doctorId: number) {
+  async selectMyPatientDiagnosis(doctorId: number) {
     const doctor = await this.usersRepository.findOne({
       where: { id: doctorId },
       relations: []
@@ -154,8 +155,16 @@ export class DiagnosisService {
     }
     console.log(doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses)));
     return doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses));
+  }
 
-}
+  async isPatientDiagnosticed(patientId: number) {
+    const patientDiagnosis = await this.diagnosisRepository.find({
+      where: { patient: { id: patientId } },
+      relations: ["patient"] // Si vous voulez charger d'autres relations, ajoutez-les ici
+    });
+    return patientDiagnosis && patientDiagnosis.length > 0;
+
+  }
 
 }
 
