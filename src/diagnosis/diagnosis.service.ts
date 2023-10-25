@@ -120,10 +120,16 @@ export class DiagnosisService {
   async getDiagnosisById(diagnosisId, sessionId) {
     const diagnosis = await this.diagnosisRepository.findOne({
       where: { id: diagnosisId },
-      relations: ["patient", "doctor"]
+      relations: ["patient", "doctor","treatments"]
     });
+    if(!diagnosis) {
+      throw new HttpException("Diagnosis not found", HttpStatus.NOT_FOUND);
+    }
     if (sessionId != diagnosis.patient.id && sessionId != diagnosis.doctor.id) {
       throw new HttpException("You don't have access to this diagnosis", HttpStatus.BAD_REQUEST);
+    }
+    if (!diagnosis.diagnosisValidated) {
+      throw new HttpException("This diagnosis is not validated", HttpStatus.BAD_REQUEST);
     }
 
     return toDiagnosisDto(diagnosis);
