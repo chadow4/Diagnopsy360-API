@@ -25,25 +25,40 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
   @WebSocketServer()
   server: Server;
-  users: Map<string, number> = new Map();
+
+  // Map pour associer userId à socketId
+  users: Map<number, string> = new Map();
 
   handleConnection(client: Socket, ...args: any[]) {
     console.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.users.delete(client.id);
+    const userIdToDelete = [...this.users.entries()]
+      .find(([_, socketId]) => socketId === client.id)?.[0];
+    if (userIdToDelete) {
+      this.users.delete(userIdToDelete);
+    }
     console.log(`Client disconnected: ${client.id}`);
+    console.log(this.users);
   }
 
   @SubscribeMessage("join")
   handleJoin(client: Socket, userId: number): void {
-    this.users.set(client.id, userId);
+    this.users.set(userId, client.id);
+    console.log(this.users);
   }
 
   @SubscribeMessage("message")
-  async handleMessage(client: Socket, messsage: MessageSocketDto): Promise<void> {
-    await this.messageService.createMessage(messsage.authorId, messsage.content, messsage.diagnosisId);
-    this.server.emit("newMessage", messsage);
+  async handleMessage(client: Socket, message: MessageSocketDto): Promise<void> {
+    await this.messageService.createMessage(message.authorId, message.content, message.diagnosisId);
+
+    const destinationSocketId = this.users.get(message.destinationId);
+
+    client.emit("newMessage", message);
+
+    if (destinationSocketId) {
+      this.server.to(destinationSocketId).emit("newMessage", message);
+    }
   }
 }

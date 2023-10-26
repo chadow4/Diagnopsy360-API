@@ -14,4 +14,5 @@ export class MessageSocketDto{
     content: string;
     diagnosisId: number;
     authorFirstname: string;
+    destinationId: number;
 }
