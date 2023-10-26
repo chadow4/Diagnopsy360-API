@@ -25,11 +25,21 @@ export class DiagnosisController {
     }
   }
 
+  @Get("mydiags")
+  @UseGuards(AuthGuard("jwt"))
+  async selectMyPatientDiagnosis(@Request() req) {
+    try { 
+      return await this.diagnosisService.selectMyPatientDiagnosis(req.user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get(":id")
   @UseGuards(AuthGuard("jwt"))
   async getDiagnosisById(@Request() req, @Param("id") diagnosisId: number) {
     try {
-      return this.diagnosisService.getDiagnosisById(diagnosisId, req.user.id);
+      return this.diagnosisService.getDiagnosisById(diagnosisId, req.user.id, req.user.role);
     } catch (error) {
       throw error;
     }
@@ -76,6 +86,16 @@ export class DiagnosisController {
     }
   }
 
-
+  @Get("isDiagnosticed/:id")
+  @HasRoles(Role.Doctor)
+  @UseGuards(AuthGuard("jwt"))
+  async isPatientDiagnosticed(@Request() req, @Param("id") patientId) {
+    try {
+      console.log(patientId);
+      return await this.diagnosisService.isPatientDiagnosticed(patientId);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
