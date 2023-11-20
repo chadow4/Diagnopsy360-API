@@ -40,13 +40,11 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
       this.users.delete(userIdToDelete);
     }
     console.log(`Client disconnected: ${client.id}`);
-    console.log(this.users);
   }
 
   @SubscribeMessage("join")
   handleJoin(client: Socket, userId: number): void {
     this.users.set(userId, client.id);
-    console.log(this.users);
   }
 
   @SubscribeMessage("message")

@@ -123,6 +123,9 @@ export class DiagnosisService {
       where: { id: diagnosisId },
       relations: ["patient", "doctor","treatments"]
     });
+    if(!diagnosis){
+      throw new HttpException("Diagnosis not found", HttpStatus.NOT_FOUND);
+    }
     if (sessionId != diagnosis.patient.id && role != Role.Doctor) {
       throw new HttpException("You don't have access to this diagnosis", HttpStatus.BAD_REQUEST);
     }
@@ -147,14 +150,32 @@ export class DiagnosisService {
 
     const doctorDiagnoses = await this.diagnosisRepository.find({
       where: { doctor: { id: doctorId } },
-      relations: ["patient"] // Si vous voulez charger d'autres relations, ajoutez-les ici
+      relations: ["patient"]
     });
 
     if (!doctorDiagnoses || doctorDiagnoses.length === 0) {
-      throw new HttpException("No diagnosis found for this doctor", HttpStatus.NOT_FOUND);
+      throw new HttpException("No diagnosis found for this doctor", HttpStatus.BAD_REQUEST);
     }
-    console.log(doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses)));
     return doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses));
+  }
+
+  async getMyDiagnosis(patientId: number){
+    const patient = await this.usersRepository.findOne({
+      where: { id: patientId },
+      relations: []
+    });
+    if(!patient){
+      throw new HttpException("Patient not found", HttpStatus.NOT_FOUND);
+    }
+    const patientDiagnoses = await this.diagnosisRepository.find({
+      where: { patient: { id: patientId } },
+    });
+
+    if (!patientDiagnoses || patientDiagnoses.length === 0) {
+      throw new HttpException("No diagnosis found for this patient", HttpStatus.BAD_REQUEST);
+    }
+    return patientDiagnoses.map(patientDiagnoses => toDiagnosisDto(patientDiagnoses));
+
   }
 
   async isPatientDiagnosticed(patientId: number) {

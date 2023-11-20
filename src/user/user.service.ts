@@ -121,7 +121,6 @@ export class UserService {
 
     async showAllPatient():Promise<UserDto[]> {
         const users = await this.usersRepository.find({ where: { role: Role.Patient } });
-        console.log(users);
         return users.map(user => toUserDto(user));
     }
     

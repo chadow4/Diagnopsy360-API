@@ -13,7 +13,6 @@ export class MessageController {
     @Param("diagnosisId") diagnosisId: number
   ): Promise<MessageDto[]> {
     try {
-      console.log("diagnosisId", diagnosisId);
       return await this.messageService.getMessagesByDiagnosisId(diagnosisId);
     } catch (error) {
       throw error;

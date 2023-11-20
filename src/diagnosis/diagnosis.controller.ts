@@ -25,15 +25,26 @@ export class DiagnosisController {
     }
   }
 
-  @Get("mydiags")
-  @UseGuards(AuthGuard("jwt"))
+  @Get("mypatientsdiags")
+  @HasRoles(Role.Doctor)
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
   async selectMyPatientDiagnosis(@Request() req) {
-    try { 
+    try {
       return await this.diagnosisService.selectMyPatientDiagnosis(req.user.id);
     } catch (error) {
       throw error;
     }
   }
+  @Get("mydiags")
+  @UseGuards(AuthGuard("jwt"))
+  async getMyDiagnosis(@Request() req) {
+    try {
+      return await this.diagnosisService.getMyDiagnosis(req.user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   @Get(":id")
   @UseGuards(AuthGuard("jwt"))
@@ -91,7 +102,6 @@ export class DiagnosisController {
   @UseGuards(AuthGuard("jwt"))
   async isPatientDiagnosticed(@Request() req, @Param("id") patientId) {
     try {
-      console.log(patientId);
       return await this.diagnosisService.isPatientDiagnosticed(patientId);
     } catch (error) {
       throw error;
