@@ -3,11 +3,12 @@ import { HasRoles } from "../auth/has-roles.decorator";
 import { Role } from "../auth/interface/role.enum";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesGuard } from "../auth/roles.guard";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiParam } from "@nestjs/swagger";
 import { DiagnosisService } from "./diagnosis.service";
-import { ResponseDiagnosisDto, SendSymtomsDiagnosisDto } from "./diagnosis.dto";
+import { DiagnosisDto, ResponseDiagnosisDto, SendSymptomsDiagnosisDto } from "./diagnosis.dto";
 
 @ApiTags("Diagnosis")
+@ApiBearerAuth()
 @Controller("diagnosis")
 export class DiagnosisController {
 
@@ -17,6 +18,8 @@ export class DiagnosisController {
   @Get()
   @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @ApiOperation({ summary: 'Get all unvalidated diagnoses', operationId: 'getDiagnosisNotValidated' })
+  @ApiResponse({ status: 200, description: 'List of unvalidated diagnoses' , type: [DiagnosisDto]})
   async getDiagnosisNotValidated() {
     try {
       return this.diagnosisService.getDiagnosisNotValidated();
@@ -28,6 +31,8 @@ export class DiagnosisController {
   @Get("mypatientsdiags")
   @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @ApiOperation({ summary: 'Get diagnoses of my patients', operationId: 'selectMyPatientDiagnosis' })
+  @ApiResponse({ status: 200, description: 'List of diagnoses for my patients', type: [DiagnosisDto] })
   async selectMyPatientDiagnosis(@Request() req) {
     try {
       return await this.diagnosisService.selectMyPatientDiagnosis(req.user.id);
@@ -35,8 +40,11 @@ export class DiagnosisController {
       throw error;
     }
   }
+
   @Get("mydiags")
   @UseGuards(AuthGuard("jwt"))
+  @ApiOperation({ summary: 'Get diagnoses for the authenticated user', operationId: 'getMyDiagnosis' })
+  @ApiResponse({ status: 200, description: 'List of diagnoses for the authenticated user' , type: [DiagnosisDto]})
   async getMyDiagnosis(@Request() req) {
     try {
       return await this.diagnosisService.getMyDiagnosis(req.user.id);
@@ -45,10 +53,12 @@ export class DiagnosisController {
     }
   }
 
-
   @Get(":id")
   @UseGuards(AuthGuard("jwt"))
-  async getDiagnosisById(@Request() req, @Param("id") diagnosisId: number) {
+  @ApiOperation({ summary: 'Get diagnosis by ID', operationId: 'getDiagnosisById' })
+  @ApiParam({ name: "id", description: "ID of the diagnosis to fetch" })
+  @ApiResponse({ status: 200, description: 'Diagnosis details', type: DiagnosisDto })
+  async getDiagnosisById(@Request() req: any, @Param("id") diagnosisId: number) {
     try {
       return this.diagnosisService.getDiagnosisById(diagnosisId, req.user.id, req.user.role);
     } catch (error) {
@@ -58,11 +68,14 @@ export class DiagnosisController {
 
   @Post("send")
   @UseGuards(AuthGuard("jwt"))
-  async sendSymptomsDiagnosis(@Request() req, @Body() sendSymptomsDiagnosisDto: SendSymtomsDiagnosisDto) {
+  @ApiOperation({ summary: 'Send symptoms for diagnosis', operationId: 'sendSymptomsDiagnosis' })
+  @ApiResponse({ status: 200, description: 'Symptoms sent successfully' })
+  @ApiBody({ type: SendSymptomsDiagnosisDto })
+  async sendSymptomsDiagnosis(@Request() req: any, @Body() sendSymptomsDiagnosisDto: SendSymptomsDiagnosisDto) {
     try {
       await this.diagnosisService.sendSymptomsDiagnosis(sendSymptomsDiagnosisDto, req.user.id);
       return {
-        message: "your symptoms have been sent"
+        message: "Your symptoms have been sent"
       };
     } catch (error) {
       throw error;
@@ -72,7 +85,10 @@ export class DiagnosisController {
   @Put("select/:id")
   @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
-  async selectDoctorDiagnosis(@Request() req, @Param("id") diagnosisId: number) {
+  @ApiOperation({ summary: 'Select a diagnosis by ID (for doctors)', operationId: 'selectDoctorDiagnosis' })
+  @ApiParam({ name: "id", description: "ID of the diagnosis to select" })
+  @ApiResponse({ status: 200, description: 'Diagnosis selected successfully' })
+  async selectDoctorDiagnosis(@Request() req: any, @Param("id") diagnosisId: number) {
     try {
       await this.diagnosisService.selectDoctorDiagnosis(diagnosisId, req.user.id);
       return {
@@ -86,6 +102,9 @@ export class DiagnosisController {
   @Put("response/:id")
   @HasRoles(Role.Doctor)
   @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @ApiOperation({ summary: 'Create a response for a diagnosis (for doctors)', operationId: 'createResponseDiagnosis' })
+  @ApiParam({ name: "id", description: "ID of the diagnosis to respond to" })
+  @ApiResponse({ status: 200, description: 'Response created successfully' })
   async createResponseDiagnosis(@Request() req, @Param("id") diagnosisId, @Body() responseDiagnosisDto: ResponseDiagnosisDto) {
     try {
       await this.diagnosisService.createResponseDiagnosis(responseDiagnosisDto, req.user.id, diagnosisId);
@@ -96,16 +115,4 @@ export class DiagnosisController {
       throw error;
     }
   }
-
-  @Get("isDiagnosticed/:id")
-  @HasRoles(Role.Doctor)
-  @UseGuards(AuthGuard("jwt"))
-  async isPatientDiagnosticed(@Request() req, @Param("id") patientId) {
-    try {
-      return await this.diagnosisService.isPatientDiagnosticed(patientId);
-    } catch (error) {
-      throw error;
-    }
-  }
 }
-

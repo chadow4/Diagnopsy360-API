@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { UserEntity } from "../user/user.entity";
 import { DiagnosisEntity } from "./diagnosis.entity";
-import { ResponseDiagnosisDto, SendSymtomsDiagnosisDto } from "./diagnosis.dto";
+import { ResponseDiagnosisDto, SendSymptomsDiagnosisDto } from "./diagnosis.dto";
 import { toDiagnosisDto } from "../shared/mapper";
 import { Role } from "../auth/interface/role.enum";
 import { TreatmentEntity } from "../treatment/treatment.entity";
@@ -20,7 +20,7 @@ export class DiagnosisService {
   ) {
   }
 
-  async sendSymptomsDiagnosis(sendSymptomsDiagnosisDto: SendSymtomsDiagnosisDto, userId: number) {
+  async sendSymptomsDiagnosis(sendSymptomsDiagnosisDto: SendSymptomsDiagnosisDto, userId: number) {
     if (!sendSymptomsDiagnosisDto.symptoms) {
       throw new HttpException("Symptoms are required", HttpStatus.BAD_REQUEST);
     }

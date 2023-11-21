@@ -19,15 +19,10 @@ export class UserService {
     ) {
     }
 
-    async showAllUsers(): Promise<UserDto[]> {
-        const users = await this.usersRepository.find();
-        return users.map(user => toUserDto(user));
-    }
-
     async findOneById(id: number): Promise<UserDto> {
         const user = await this.usersRepository.findOne({
             where: { id },
-            relations: ["myDiagnoses", "myDiagnoses.doctor", "myDiagnoses.treatments", "myPatientsDiagnoses", "myPatientsDiagnoses.patient", "myPatientsDiagnoses.treatments"]
+            relations: []
         });
         if (!user) {
             throw new HttpException("User not Found", HttpStatus.NOT_FOUND);
@@ -119,27 +114,4 @@ export class UserService {
         await this.usersRepository.remove(user);
     }
 
-    async showAllPatient():Promise<UserDto[]> {
-        const users = await this.usersRepository.find({ where: { role: Role.Patient } });
-        return users.map(user => toUserDto(user));
-    }
-    
-    async showPatientsWithNoDoctor(): Promise<UserDto[]> {
-        // Trouvez tous les diagnostics où le champ 'doctor' est null
-        const patientsWithoutDoctor = await this.diagnosisRepository.find({
-            where: {
-                doctor: IsNull()
-            },
-            relations: ['patient']
-        });
-    
-        // Utilisez un Set pour garantir l'unicité des identifiants des patients
-        const uniquePatientIds = [...new Set(patientsWithoutDoctor.map(diagnosis => diagnosis.patient.id))];
-    
-        // Obtenez les utilisateurs correspondant à ces identifiants uniques
-        const usersWithoutDoctor = await this.usersRepository.findByIds(uniquePatientIds);
-        
-        return usersWithoutDoctor.map(user => toUserDto(user));
-    }
-    
 }

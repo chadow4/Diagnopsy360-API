@@ -1,32 +1,25 @@
 import { Body, Controller, Delete, Get, Param, Put, Request, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { UserUpdateDto, UserUpdatePasswordDto } from "./user.dto";
+import { UserDto, UserUpdateDto, UserUpdatePasswordDto } from "./user.dto";
 import { HasRoles } from "../auth/has-roles.decorator";
 import { Role } from "../auth/interface/role.enum";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesGuard } from "../auth/roles.guard";
-import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("User")
 @Controller("user")
+@ApiBearerAuth()
 export class UserController {
 
   constructor(private userService: UserService) {
   }
 
-  @Get()
-  @UseGuards(AuthGuard("jwt"))
-  async showAllUsers() {
-    try {
-      return await this.userService.showAllUsers();
-    } catch (error) {
-      throw error;
-    }
-  }
-
   @Get("myinfos")
   @UseGuards(AuthGuard("jwt"))
-  async getMyInfo(@Request() req) {
+  @ApiOperation({ summary: "Get current user information", description: "Returns information about the current user." })
+  @ApiOkResponse({ description: "Information of the current user", type: UserDto })
+  async getMyInfo(@Request() req: any): Promise<UserDto> {
     try {
       return await this.userService.findOneById(req.user.id);
     } catch (error) {
@@ -34,44 +27,17 @@ export class UserController {
     }
   }
 
-  @Get("patients")
-  @UseGuards(AuthGuard("jwt"))
-  async showAllPatient(@Request() req) {
-    try {
-      return await this.userService.showAllPatient();
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Get("patientsnodoctor")
-  @UseGuards(AuthGuard("jwt"))
-  async showPatientsWithNoDoctor(@Request() req) {
-    try {
-      return await this.userService.showPatientsWithNoDoctor();
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Get(":id")
-  @HasRoles(Role.Doctor)
-  @UseGuards(AuthGuard("jwt"), RolesGuard)
-  async findOneById(@Param("id") id: number) {
-    try {
-      return await this.userService.findOneById(id);
-    } catch (error) {
-      throw error;
-    }
-  }
 
   @Put()
   @UseGuards(AuthGuard("jwt"))
-  async updateUser(@Request() req, @Body() userUpdateDto: UserUpdateDto) {
+  @ApiOperation({ summary: "Update a user", description: "Updates a user's information." })
+  @ApiOkResponse({ description: "User updated successfully" })
+  @ApiBody({ type: UserUpdateDto, description: "Data for updating the user" })
+  async updateUser(@Request() req: any, @Body() userUpdateDto: UserUpdateDto) {
     try {
       await this.userService.updateUser(req.user.id, userUpdateDto);
       return {
-        message: "User updated"
+        message: "User updated successfully"
       };
     } catch (error) {
       throw error;
@@ -80,7 +46,10 @@ export class UserController {
 
   @Put("password")
   @UseGuards(AuthGuard("jwt"))
-  async updateUserPassword(@Request() req, @Body() userUpdatePasswordDto: UserUpdatePasswordDto) {
+  @ApiOperation({ summary: "Update user password", description: "Updates a user's password." })
+  @ApiOkResponse({ description: "Password updated successfully" })
+  @ApiBody({ type: UserUpdatePasswordDto, description: "Data for updating the user password" })
+  async updateUserPassword(@Request() req: any, @Body() userUpdatePasswordDto: UserUpdatePasswordDto) {
     try {
       await this.userService.updateUserPassword(req.user.id, userUpdatePasswordDto);
       return {
@@ -93,7 +62,9 @@ export class UserController {
 
   @Delete(":id")
   @UseGuards(AuthGuard("jwt"))
-  @ApiOkResponse({ description: "User deleted" })
+  @ApiOperation({ summary: "Delete a user by ID", description: "Deletes a user by ID." })
+  @ApiOkResponse({ description: "User deleted successfully" })
+  @ApiParam({ name: "id", type: "number", description: "User ID to delete" })
   async deleteUser(@Param("id") id: number) {
     try {
       await this.userService.deleteUser(id);
@@ -106,4 +77,3 @@ export class UserController {
 
   }
 }
-

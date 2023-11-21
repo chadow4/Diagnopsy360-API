@@ -25,7 +25,7 @@ export class TreatmentService {
             relations: []
         });
         if (!Treatment) {
-            throw new HttpException("Treatment not Found", HttpStatus.NOT_FOUND);
+            throw new HttpException("Treatment was not Found", HttpStatus.BAD_REQUEST);
         }
         return toTreatmentDto(Treatment);
     }
