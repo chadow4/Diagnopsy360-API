@@ -32,9 +32,6 @@ export class UserUpdateDto {
   @IsEmail()
   @ApiProperty({ description: "L'email de l'utilisateur" })
   email?: string;
-
-  @ApiProperty({ description: "Le mot de passe de l'utilisateur" })
-  password?: string;
 }
 
 export class UserUpdatePasswordDto {
