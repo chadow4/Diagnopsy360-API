@@ -152,10 +152,6 @@ export class DiagnosisService {
       where: { doctor: { id: doctorId } },
       relations: ["patient"]
     });
-
-    if (!doctorDiagnoses || doctorDiagnoses.length === 0) {
-      throw new HttpException("No diagnosis found for this doctor", HttpStatus.BAD_REQUEST);
-    }
     return doctorDiagnoses.map(doctorDiagnoses => toDiagnosisDto(doctorDiagnoses));
   }
 
@@ -171,9 +167,6 @@ export class DiagnosisService {
       where: { patient: { id: patientId } },
     });
 
-    if (!patientDiagnoses || patientDiagnoses.length === 0) {
-      throw new HttpException("No diagnosis found for this patient", HttpStatus.BAD_REQUEST);
-    }
     return patientDiagnoses.map(patientDiagnoses => toDiagnosisDto(patientDiagnoses));
 
   }
