@@ -8,9 +8,6 @@
 <br/>
 Diagnopsy360 API est une interface de programmation d'application (API) développée avec [NestJS](https://nestjs.com/), un framework Node.js progressif pour la construction d'applications côté serveur efficaces, fiables et évolutives. Cette API fonctionne en tandem avec le front-end Diagnopsy360 pour gérer les données et les interactions côté serveur, en utilisant l'ORM TypeORM pour la gestion des bases de données MySQL.
 
- L'API possède une documentation Swagger complète accessible via [https://jsmb.fr:35000/documentation](https://jsmb.fr:35000/documentation), permettant une compréhension claire et une interaction facile avec les différents endpoints.
-
-
 ## I. Pré-requis
 
 -   **Node.js et npm (Node Package Manager)** NestJS, comme Angular, nécessite Node.js pour l'environnement d'exécution et npm pour la gestion des paquets.
@@ -41,3 +38,6 @@ Il est biensur nécessaire de créer en amont la database, seule les tables sero
     
 2.  **Lancement du serveur de développement** Utilisez `npm run start` pour démarrer le serveur. Vous pouvez également utiliser `npm run start:dev` pour un environnement de développement qui se recharge automatiquement à chaque modification de fichier.
     
+## IV. Documentation Swagger (
+
+L'API possède une documentation Swagger complète accessible via [https://jsmb.fr:35000/documentation](https://jsmb.fr:35000/documentation), permettant une compréhension claire et une interaction facile avec les différents endpoints.
