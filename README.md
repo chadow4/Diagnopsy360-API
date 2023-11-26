@@ -1,5 +1,5 @@
 
-#  Diagnopsy360 API Back-End
+#  Diagnopsy360 API Back-End - Joshua GUYOT & Julien SANCHEZ
 
 <div align="center">
     <img src="https://diagnopsy.jsmb.fr/assets/img/logo.png" alt="Logo Diagnopsy360" width="500" height="auto"/>
